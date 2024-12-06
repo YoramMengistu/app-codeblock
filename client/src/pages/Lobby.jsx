@@ -1,0 +1,57 @@
+import axios from "axios";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+const Lobby = () => {
+  const navigate = useNavigate();
+  const [codeBlocks, setCodeBlocks] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchCodeBlocks = async () => {
+      try {
+        await axios
+          .get(`${import.meta.env.VITE_APP_SOCKET_URL}/api/codeblocks`)
+          .then((response) => {
+            setCodeBlocks(response.data); 
+            setLoading(false);
+          });
+      } catch (err) {
+        setError("Failed to fetch code blocks");
+        setLoading(false);
+      }
+    };
+
+    fetchCodeBlocks();
+  }, []);
+
+  if (loading) {
+    return <p>{loading}</p>;
+  }
+  if (error) {
+    return <p>{error}</p>;
+  }
+
+  return (
+    <div className="h-screen bg-slate-200">
+      <div className=" flex justify-center items-center h-screen flex-col">
+        <h1 className="mb-4 font-serif text-3xl">Choose Code Block</h1>
+
+        <ul className="flex gap-4 font-serif ">
+          {codeBlocks.map((block) => (
+            <li
+              className="duration-300 transition-all hover:text-orange-300"
+              key={block.title}
+              onClick={() => navigate(`/codeblock/${block._id}/`)}
+            >
+              {block.title}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+};
+
+export default Lobby;
