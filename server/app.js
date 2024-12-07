@@ -64,22 +64,23 @@ io.on("connection", (socket) => {
   });
 
   // check solution
-  socket.on("checkSolution", (submittedCode) => {
+  socket.on("checkSolution", async (submittedCode) => {
     const codeBlockId = Object.keys(mentors).find(
       (id) => mentors[id] === socket.id
     );
     if (codeBlockId) {
-      const codeBlock = CodeBlock.findById(codeBlockId);
-      const expectedSolution = codeBlock?.solution;
+      try {
+        const codeBlock = await CodeBlock.findById(codeBlockId);
+        const expectedSolution = codeBlock?.solution;
 
-      if (submittedCode === expectedSolution) {
-        socket.emit("solutionMatch"); // Sends a message that the solution is correct
+        if (submittedCode === expectedSolution) {
+          socket.emit("solutionMatch"); // שולח הודעה שהפתרון נכון
+        }
+      } catch (error) {
+        console.error("Error fetching code block:", error);
+        socket.emit("error", { message: "Error fetching code block" });
       }
     }
-    socket.on("solutionMatched", ({ blockId }) => {
-      // Send to students that the solution matches
-      io.to(blockId).emit("solutionMatch");
-    });
   });
 
   socket.on("disconnect", async () => {
