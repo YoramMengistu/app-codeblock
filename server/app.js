@@ -11,42 +11,46 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "https://block-code.netlify.app",
+    origin: "https://block-code.netlify.app", // Allow only this origin to connect
     methods: ["GET", "POST"],
   },
 });
 
-let mentors = {};
-let students = {};
+let mentors = {}; // Object to keep track of mentors
+let students = {}; // Object to keep track of students
+
+// Handle socket connections
 
 io.on("connection", (socket) => {
   console.log("A user connected", socket.id);
 
-  // join room
+  // Join room
   socket.on("joinCodeBlock", async (codeBlockId) => {
-    console.log(`${socket.id} joined code block ${codeBlockId}`);
-
+    // Prevent joining the same room twice
     if (socket.rooms.has(codeBlockId)) {
       console.log(`${socket.id} is already in the room`);
       return;
     }
 
+    // Assign mentor role if no mentor exists in the room
     if (!mentors[codeBlockId]) {
       mentors[codeBlockId] = socket.id;
       socket.emit("setRole", "mentor");
     } else {
+      // Otherwise, assign student role
       if (!students[codeBlockId]) students[codeBlockId] = [];
       students[codeBlockId].push(socket.id);
-      socket.emit("setRole", "student");
+      socket.emit("setRole", "student"); // Send student role to client
     }
 
     socket.join(codeBlockId);
-
+    //  the number of students in the room
     io.to(codeBlockId).emit(
       "studentsCount",
       students[codeBlockId]?.length || 0
     );
 
+    // Fetch the code block data from MongoDB
     try {
       const codeBlock = await CodeBlock.findById(codeBlockId);
       if (!codeBlock) {
@@ -63,7 +67,7 @@ io.on("connection", (socket) => {
     }
   });
 
-  // check solution
+  // // Check if the submitted solution matches the expected solution
   socket.on("checkSolution", async (submittedCode) => {
     const codeBlockId = Object.keys(mentors).find(
       (id) => mentors[id] === socket.id
@@ -83,11 +87,13 @@ io.on("connection", (socket) => {
     }
   });
 
+  // Handle socket disconnect events
   socket.on("disconnect", async () => {
     console.log("A user disconnected", socket.id);
     let codeBlockId = null;
 
-    // זיהוי החדר שבו המשתמש נמצא (מנטור או סטודנט)
+    // Identify the code block room the user belongs to (mentor or student)
+
     for (let id in mentors) {
       if (mentors[id] === socket.id) {
         codeBlockId = id;
@@ -102,24 +108,21 @@ io.on("connection", (socket) => {
       }
     }
 
-    // אם המנטור עזב, הקצה סטודנט כמנטור חדש
     if (codeBlockId && mentors[codeBlockId] === socket.id) {
-      // אם יש סטודנטים בחדר, נבחר אחד מהם כמנטור
       if (students[codeBlockId]?.length > 0) {
-        const newMentor = students[codeBlockId].shift(); // בחר סטודנט ראשון
-        mentors[codeBlockId] = newMentor; // הגדרת הסטודנט כמנטור
-        socket.to(newMentor).emit("setRole", "mentor"); // שולח הודעה לסטודנט להפוך למנטור
-        io.to(codeBlockId).emit("studentsCount", students[codeBlockId].length); // עדכון כמות הסטודנטים
+        const newMentor = students[codeBlockId].shift();
+        mentors[codeBlockId] = newMentor;
+        socket.to(newMentor).emit("setRole", "mentor");
+        io.to(codeBlockId).emit("studentsCount", students[codeBlockId].length);
       }
     }
-
-    // עדכון סטודנטים ומנטור במידה והמשתמש היה סטודנט או מנטור
+    // Notify the room of the mentor leaving
     if (codeBlockId) {
       io.to(codeBlockId).emit("mentorLeft");
       io.to(codeBlockId).emit("redirectToHome");
     }
 
-    // עדכון רשימות הסטודנטים והמנהלים
+    // Update the students and mentors lists
     for (let codeBlockId in students) {
       if (students[codeBlockId].includes(socket.id)) {
         students[codeBlockId] = students[codeBlockId].filter(
@@ -136,7 +139,7 @@ io.on("connection", (socket) => {
     for (let codeBlockId in mentors) {
       if (mentors[codeBlockId] === socket.id) {
         delete mentors[codeBlockId];
-        io.to(codeBlockId).emit("redirectToHome");
+        io.to(codeBlockId).emit("redirectToHome"); // Notify all users in the room
         io.to(codeBlockId).emit("mentorLeft");
         break;
       }
@@ -144,10 +147,11 @@ io.on("connection", (socket) => {
   });
 });
 
+// Middleware setup
 app.use(cors({ origin: "*" }));
 app.use(express.json());
 
-// Route
+// API Route
 app.use("/api/codeblocks", require("./routes/codeBlockRoute"));
 
 mongoose

@@ -39,8 +39,7 @@ const createDefaultCodeBlocks = async () => {
 // Get all code blocks
 const getCodeBlocks = async (req, res) => {
   try {
-    // השתמש ב-limit כדי למנוע חיבור מסוכן למסד נתונים עם יותר מדי נתונים
-    const blocks = await CodeBlock.find().limit(100).exec(); // לדוגמה, מגביל את מספר התוצאות
+    const blocks = await CodeBlock.find().limit(100).exec(); 
     res.status(200).json(blocks);
   } catch (error) {
     console.error("Error fetching code blocks:", error.message);
