@@ -143,7 +143,7 @@ io.on("connection", (socket) => {
   });
 });
 
-app.use(cors());
+app.use(cors({ origin: "https://block-code.netlify.app/" }));
 app.use(express.json());
 
 // Route
