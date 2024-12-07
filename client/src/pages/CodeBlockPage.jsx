@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import AceEditor from "react-ace";
@@ -16,7 +15,7 @@ const CodeBlockPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [code, setCode] = useState("");
-  const [role, setRole] = useState("mentor"); // תפקיד המנטור או הסטודנט
+  const [role, setRole] = useState("mentor");
   const [students, setStudents] = useState(0);
   const [solution, setSolution] = useState("");
   const [showSmiley, setShowSmiley] = useState(false);
