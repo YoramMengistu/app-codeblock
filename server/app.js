@@ -143,7 +143,7 @@ io.on("connection", (socket) => {
   });
 });
 
-app.use(cors({ origin: "https://app-platfrom-server-1.onrender.com" }));
+app.use(cors({ origin: "http://localhost:5174" }));
 app.use(express.json());
 
 // Route
