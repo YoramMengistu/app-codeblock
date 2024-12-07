@@ -11,7 +11,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "https://block-code.netlify.app/",
+    origin: "https://block-code.netlify.app",
     methods: ["GET", "POST"],
   },
 });
@@ -144,7 +144,7 @@ io.on("connection", (socket) => {
   });
 });
 
-app.use(cors({ origin: "https://block-code.netlify.app/" }));
+app.use(cors({ origin: "*" }));
 app.use(express.json());
 
 // Route
