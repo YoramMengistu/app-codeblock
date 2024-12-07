@@ -1,4 +1,3 @@
-//
 const CodeBlock = require("../model/codeBlockSchema");
 
 // default blocks

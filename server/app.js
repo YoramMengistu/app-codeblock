@@ -143,7 +143,7 @@ io.on("connection", (socket) => {
   });
 });
 
-app.use(cors({ origin: "http://localhost:5174" }));
+app.use(cors({ origin: "*" }));
 app.use(express.json());
 
 // Route

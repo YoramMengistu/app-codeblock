@@ -5,8 +5,6 @@ import { useNavigate } from "react-router-dom";
 const Lobby = () => {
   const navigate = useNavigate();
   const [codeBlocks, setCodeBlocks] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchCodeBlocks = async () => {
@@ -25,13 +23,6 @@ const Lobby = () => {
 
     fetchCodeBlocks();
   }, []);
-
-  if (loading) {
-    return <p>{loading}</p>;
-  }
-  if (error) {
-    return <p>{error}</p>;
-  }
 
   return (
     <div className="h-screen bg-slate-200">
