@@ -6,9 +6,7 @@ import "ace-builds/src-noconflict/mode-javascript";
 import "ace-builds/src-noconflict/worker-javascript";
 import socketIOClient from "socket.io-client";
 
-const socket = socketIOClient(
-  import.meta.env.VITE_APP_SOCKET_URL || "http://localhost:5007"
-);
+const socket = socketIOClient(import.meta.env.VITE_APP_SOCKET_URL);
 
 ace.config.set(
   "workerPath",

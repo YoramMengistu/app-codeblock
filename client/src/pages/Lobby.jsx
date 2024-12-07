@@ -14,7 +14,7 @@ const Lobby = () => {
         await axios
           .get(`${import.meta.env.VITE_APP_SOCKET_URL}/api/codeblocks`)
           .then((response) => {
-            setCodeBlocks(response.data); 
+            setCodeBlocks(response.data);
             setLoading(false);
           });
       } catch (err) {
