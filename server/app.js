@@ -11,7 +11,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "https://code-block-client.netlify.app/",
+    origin: ["http://localhost:5174", "https://code-block-client.netlify.app"],
     methods: ["GET", "POST"],
   },
 });
