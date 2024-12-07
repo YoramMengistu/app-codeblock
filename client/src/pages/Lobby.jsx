@@ -6,13 +6,13 @@ const Lobby = () => {
   const navigate = useNavigate();
   const [codeBlocks, setCodeBlocks] = useState([]);
 
+  // Fetch code blocks when the component mounts
   useEffect(() => {
     const fetchCodeBlocks = async () => {
       try {
         await axios
           .get(`${import.meta.env.VITE_APP_SOCKET_URL}/api/codeblocks`)
           .then((response) => {
-            console.log(response.data);
             setCodeBlocks(response.data);
           });
       } catch (err) {
@@ -33,7 +33,7 @@ const Lobby = () => {
             <li
               className="duration-300 transition-all hover:text-orange-300"
               key={block.title}
-              onClick={() => navigate(`/codeblock/${block._id}/`)}
+              onClick={() => navigate(`/codeblock/${block._id}/`)} // Navigate to the code block page
             >
               {block.title}
             </li>
